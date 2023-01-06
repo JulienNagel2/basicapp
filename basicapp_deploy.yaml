@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: basicapp-deploy
+spec:
+  selector:
+    matchLabels:
+      app: basicapp
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: basicapp
+        tier: frontend
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - basicapp
+            topologyKey: "kubernetes.io/hostname"    
+      containers:
+      - name: nginx
+        image: "projects.registry.vmware.com/pez/nginx"
+        resources:
+          limits:
+            cpu: "0.2"
+            memory: "200Mi"
+          requests:
+            cpu: "0.1"
+            memory: "100Mi"
